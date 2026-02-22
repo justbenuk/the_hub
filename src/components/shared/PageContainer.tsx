@@ -1,8 +1,13 @@
-import { cn } from "@/lib/utils";
-import { RootProps } from "@/types";
+import { ComponentProps } from "react";
 
-export default function PageContainer({ children, className }: RootProps) {
+import { cn } from "@/lib/utils";
+
+type PageContainerProps = ComponentProps<"div">;
+
+export default function PageContainer({ children, className, ...props }: PageContainerProps) {
   return (
-    <div className={cn("container mx-auto px-6 2xl:px-0")}>{children}</div>
+    <div className={cn("container mx-auto px-6 2xl:px-0", className)} {...props}>
+      {children}
+    </div>
   );
 }

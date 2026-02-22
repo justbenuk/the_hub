@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tamworth Hub
 
-## Getting Started
+A clean, modern community hub built with Next.js App Router, Server Actions, Prisma, and shadcn/ui.
 
-First, run the development server:
+Features include:
+
+- Business directory with listing requests
+- Jobs, events, news, and charities sections
+- Public submission forms with admin moderation workflow
+- Search and filtering on each section page
+- Stripe subscription checkout and billing portal for paid plans
+- Admin analytics with profile views, clicks, and CTR
+- SEO enhancements for business profiles (metadata, OG image, JSON-LD)
+- Admin clients view with user plans and linked listings
+- Owner listing edit workflow that re-enters moderation
+- Automatic featured ranking/badges for paid plan businesses and matching job posts
+
+## Stack
+
+- Next.js 16 (App Router)
+- Prisma 7 + SQLite
+- Server Actions for auth and business listing requests
+- shadcn/ui components + Tailwind CSS
+
+## Quick Start
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Create environment file:
+
+```bash
+cp .env.example .env.local
+```
+
+3. Run Prisma migration:
+
+```bash
+DATABASE_URL="file:./dev.db" npm run prisma:migrate -- --name init
+```
+
+4. Seed local sample data:
+
+```bash
+DATABASE_URL="file:./dev.db" npm run prisma:seed
+```
+
+5. Start development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Stripe Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Add these values to `.env.local`:
 
-## Learn More
+- `NEXT_PUBLIC_APP_URL`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `STRIPE_PRICE_GROWTH`
+- `STRIPE_PRICE_PARTNER`
 
-To learn more about Next.js, take a look at the following resources:
+Run Stripe webhook listener in development:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+stripe listen --forward-to localhost:3000/api/stripe/webhook
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The business pricing page is at `/for-business`.
 
-## Deploy on Vercel
+## Admin Setup
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+To grant an existing user admin access:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+DATABASE_URL="file:./dev.db" npm run make:admin -- you@example.com
+```
+
+Admin moderation is available at `/admin/moderation`.
+
+Client account overview is available at `/admin/clients`.
+
+## Scripts
+
+- `npm run dev` - start local dev server
+- `npm run build` - production build
+- `npm run lint` - run ESLint
+- `npm run prisma:generate` - generate Prisma client
+- `npm run prisma:migrate` - create/apply migrations
+- `npm run prisma:seed` - seed Tamworth sample directory/news/events/jobs data
+- `npm run prisma:studio` - open Prisma Studio
+- `npm run make:admin -- you@example.com` - promote an existing user to admin
+
+## Auth
+
+Auth uses secure password hashing (`scrypt`) and HTTP-only session cookies backed by Prisma `Session` records.
